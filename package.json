@@ -1,0 +1,15 @@
+{
+  "name": "git-deploy-hooks",
+  "version": "0.1.0",
+  "description": "A set of sample tools to handle atomic deployments as Git hooks",
+  "main": "post-receive",
+  "scripts": {},
+  "author": "Mads <m@m4dz.net>",
+  "license": "ISC",
+  "dependencies": {
+    "nodegit": "^0.28.0-alpha.26",
+    "ps-list": "^8.1.1",
+    "rimraf": "^5.0.7",
+    "rsync": "^0.6.1"
+  }
+}
