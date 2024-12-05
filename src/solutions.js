@@ -12,7 +12,7 @@ const { rimraf } = require("rimraf");
 
 const repoPath = path.resolve(".");
 
-export async function _run(cmd) {
+async function _run(cmd) {
     const child = exec(cmd, (err) => {
         if (err) console.error(err);
     });
@@ -21,7 +21,7 @@ export async function _run(cmd) {
     await new Promise((resolve) => child.on("close", resolve));
 }
 
-export async function _build(workingDir) {
+async function _build(workingDir) {
     try {
         await fs.access(path.resolve(workingDir, "package.json"));
         const npm = `npm --prefix ${workingDir}`;
@@ -37,7 +37,7 @@ export async function _build(workingDir) {
     }
 }
 
-export async function buildWorktree({ repo: bareRepo, rev, ref, revName }) {
+async function buildWorktree({ repo: bareRepo, rev, ref, revName }) {
     const workingDir = path.join(os.tmpdir(), `git.${revName}`);
     const worktree = await Git.Worktree.add(bareRepo, rev, workingDir);
     const repo = await Git.Repository.open(workingDir);
@@ -46,7 +46,7 @@ export async function buildWorktree({ repo: bareRepo, rev, ref, revName }) {
     return worktree;
 }
 
-export async function findMergeBases({ repo, ref }) {
+async function findMergeBases({ repo, ref }) {
     const refCommit = await repo.getBranchCommit(ref);
     const refs = (await repo.getReferences()).filter((ref) => {
         try {
@@ -69,7 +69,7 @@ export async function findMergeBases({ repo, ref }) {
     );
 }
 
-export async function _mkDeployDir({ repo }) {
+async function _mkDeployDir({ repo }) {
     const repoConfig = await repo.config();
 
     let deployDir;
@@ -84,7 +84,7 @@ export async function _mkDeployDir({ repo }) {
     return deployDir;
 }
 
-export async function setupDeployDir({ repo, rsync, ref, rev }) {
+async function setupDeployDir({ repo, rsync, ref, rev }) {
     const deployRoot = await _mkDeployDir(arguments[0]);
     const deployDir = path.resolve(deployRoot, rev);
 
@@ -120,7 +120,7 @@ export async function setupDeployDir({ repo, rsync, ref, rev }) {
     return deployRoot;
 }
 
-export async function deployWorktree({ repo, worktree, rsync, rev, refName, revName }) {
+async function deployWorktree({ repo, worktree, rsync, rev, refName, revName }) {
     const repoConfig = await repo.config();
 
     const deployRoot = await setupDeployDir(arguments[0]);
@@ -163,12 +163,12 @@ export async function deployWorktree({ repo, worktree, rsync, rev, refName, revN
     return appPath;
 }
 
-export async function clean({ worktree }) {
+async function clean({ worktree }) {
     await rimraf(worktree.path());
     worktree.prune();
 }
 
-export async function triggerRestart({ appPath }) {
+async function triggerRestart({ appPath }) {
     const port = Math.floor(Math.random() * 1000) + 8000;
     const ip = await new Promise((resolve) => {
         const nets = os.networkInterfaces();
@@ -194,4 +194,16 @@ export async function triggerRestart({ appPath }) {
         { detached: true, stdio: "ignore" },
     );
     server.unref();
+}
+
+module.exports = {
+    _run,
+    _build,
+    buildWorktree,
+    findMergeBases,
+    _mkDeployDir,
+    setupDeployDir,
+    deployWorktree,
+    clean,
+    triggerRestart
 }
