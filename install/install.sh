@@ -3,7 +3,7 @@
 # Remote call: 
 # /bin/bash -c "$(curl -fsSL )"
 
-set -u
+# set -u
 
 abort() {
   printf "%s\n" "$@" >&2
@@ -42,7 +42,10 @@ do
     esac
 done
 
-set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+if [[ -z "${POSITIONAL_ARGS}" ]]
+then
+  set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+fi
 
 # string formatters
 if [[ -t 1 ]]
